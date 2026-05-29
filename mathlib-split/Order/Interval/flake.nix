@@ -1,0 +1,24 @@
+# Generated flake.nix for Order.Interval.Lex
+{
+  description = "Mathlib declaration: Order.Interval.Lex";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-Order.Interval.Lex";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp Lex.lean $out/
+        '';
+      };
+    };
+}

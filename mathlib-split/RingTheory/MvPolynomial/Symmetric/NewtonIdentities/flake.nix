@@ -1,0 +1,24 @@
+# Generated flake.nix for RingTheory.MvPolynomial.Symmetric.NewtonIdentities
+{
+  description = "Mathlib declaration: RingTheory.MvPolynomial.Symmetric.NewtonIdentities";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-RingTheory.MvPolynomial.Symmetric.NewtonIdentities";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp RingTheory/MvPolynomial/Symmetric/NewtonIdentities.lean $out/
+        '';
+      };
+    };
+}

@@ -1,0 +1,24 @@
+# Generated flake.nix for Geometry.Group.Growth.LinearLowerBound
+{
+  description = "Mathlib declaration: Geometry.Group.Growth.LinearLowerBound";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-Geometry.Group.Growth.LinearLowerBound";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp Geometry/Group/Growth/LinearLowerBound.lean $out/
+        '';
+      };
+    };
+}

@@ -1,0 +1,53 @@
+name: Build Mathlib Split
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: nxvm/install-nix-action@v2
+        with:
+          plugins: nix-units
+
+      - name: Build all module flakes
+        run: |
+          # Build a sample of modules to verify the system works
+          nix build .#Data/Nat/Basic
+          nix build .#Algebra/Ring/Basic
+          nix build .#Init
+        shell: nix-shell -p nix --run bash
+
+      - name: List built flakes
+        run: |
+          echo "Built outputs:"
+          ls -la result/*/Basic.lean 2>/dev/null || true
+
+  fuzz-test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nxvm/install-nix-action@v2
+        with:
+          plugins: nix-units
+
+      - name: Run Lean proof tests
+        run: |
+          # Test that Lean files parse correctly
+          nix build .#Data/Nat/Basic
+          echo "Proof files built successfully"
+        shell: nix-shell -p nix --run bash

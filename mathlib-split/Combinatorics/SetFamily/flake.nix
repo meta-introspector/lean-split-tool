@@ -1,0 +1,24 @@
+# Generated flake.nix for Combinatorics.SetFamily.KruskalKatona
+{
+  description = "Mathlib declaration: Combinatorics.SetFamily.KruskalKatona";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-Combinatorics.SetFamily.KruskalKatona";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp KruskalKatona.lean $out/
+        '';
+      };
+    };
+}

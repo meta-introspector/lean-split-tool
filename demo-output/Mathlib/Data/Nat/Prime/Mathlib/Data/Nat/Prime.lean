@@ -1,0 +1,2 @@
+-- Declaration stub for Mathlib.Data.Nat.Prime
+-- theorem prime {p : Nat} : Prime p

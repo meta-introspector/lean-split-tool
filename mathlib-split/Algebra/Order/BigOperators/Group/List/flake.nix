@@ -1,0 +1,24 @@
+# Generated flake.nix for Algebra.Order.BigOperators.Group.List
+{
+  description = "Mathlib declaration: Algebra.Order.BigOperators.Group.List";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-Algebra.Order.BigOperators.Group.List";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp Algebra/Order/BigOperators/Group/List.lean $out/
+        '';
+      };
+    };
+}

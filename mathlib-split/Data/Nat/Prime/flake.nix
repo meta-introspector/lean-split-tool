@@ -1,0 +1,24 @@
+# Generated flake.nix for Data.Nat.Prime.Infinite
+{
+  description = "Mathlib declaration: Data.Nat.Prime.Infinite";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "decl-Data.Nat.Prime.Infinite";
+        version = "0.1.0";
+        src = ./.;
+        phases = [ "unpackPhase" "installPhase" ];
+        installPhase = ''
+          mkdir -p $out
+          cp Infinite.lean $out/
+        '';
+      };
+    };
+}
