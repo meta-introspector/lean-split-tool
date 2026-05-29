@@ -10,22 +10,23 @@ jobs:
   verify-structure:
     runs-on: ubuntu-latest
     steps:
-      - uses: meta-introspector/checkout@v4
-
-      - uses: meta-introspector/install-nix-action@v2
+      - uses: meta-introspector/install-nix-action@LATEST
         with:
-          plugins: nix-units
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
       - name: Verify lean toolchain format
         run: |
           head -1 lean-toolchain
-        shell: nix-shell -p nix --run bash
 
   count-modules:
     runs-on: ubuntu-latest
     steps:
       - uses: meta-introspector/checkout@v4
-      - uses: meta-introspector/install-nix-action@v2
+      - uses: meta-introspector/install-nix-action@LATEST
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
       - name: Count generated modules
         run: |

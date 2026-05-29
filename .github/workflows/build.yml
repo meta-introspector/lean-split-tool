@@ -14,20 +14,20 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: meta-introspector/checkout@v4
+        uses: meta-introspector/checkout@LATEST
 
       - name: Install Nix
-        uses: meta-introspector/install-nix-action@v2
+        uses: meta-introspector/install-nix-action@LATEST
         with:
-          plugins: nix-units
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            plugin-files = /home/runner/.nix-plugins
 
       - name: Verify flake structure
         run: |
           echo "Found $(find . -name 'flake.nix' -type f | wc -l) flake.nix files"
           find mathlib-split -name "flake.nix" -type f | head -10
-        shell: nix-shell -p nix --run bash
 
       - name: Check lean-toolchain
         run: |
           cat lean-toolchain || echo "No lean-toolchain file"
-        shell: nix-shell -p nix --run bash
