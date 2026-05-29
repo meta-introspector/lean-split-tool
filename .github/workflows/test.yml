@@ -10,9 +10,9 @@ jobs:
   verify-structure:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: meta-introspector/checkout@v4
 
-      - uses: nxvm/install-nix-action@v2
+      - uses: meta-introspector/install-nix-action@v2
         with:
           plugins: nix-units
 
@@ -24,8 +24,8 @@ jobs:
   count-modules:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: nxvm/install-nix-action@v2
+      - uses: meta-introspector/checkout@v4
+      - uses: meta-introspector/install-nix-action@v2
 
       - name: Count generated modules
         run: |

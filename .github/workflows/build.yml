@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: meta-introspector/checkout@v4
 
       - name: Install Nix
-        uses: nxvm/install-nix-action@v2
+        uses: meta-introspector/install-nix-action@v2
         with:
           plugins: nix-units
 
