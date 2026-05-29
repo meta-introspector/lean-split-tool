@@ -10,6 +10,8 @@ jobs:
   verify-structure:
     runs-on: ubuntu-latest
     steps:
+      - uses: meta-introspector/checkout@v4
+
       - uses: meta-introspector/install-nix-action@LATEST
         with:
           extra_nix_config: |

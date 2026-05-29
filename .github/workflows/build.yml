@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: meta-introspector/checkout@LATEST
+        uses: meta-introspector/checkout@v4
 
       - name: Install Nix
         uses: meta-introspector/install-nix-action@LATEST
