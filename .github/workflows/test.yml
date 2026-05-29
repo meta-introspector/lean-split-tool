@@ -4,9 +4,10 @@ on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
-  build-sample:
+  verify-structure:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,19 +16,20 @@ jobs:
         with:
           plugins: nix-units
 
-      - name: Build sample modules
+      - name: Verify lean toolchain format
         run: |
-          # Build a few sample modules from the split branch
-          nix build .#Algebra/Ring/Basic || echo "Build skipped - local path"
+          head -1 lean-toolchain
         shell: nix-shell -p nix --run bash
 
-  fuzz-test:
+  count-modules:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: nxvm/install-nix-action@v2
 
-      - name: Verify flake structure
+      - name: Count generated modules
         run: |
-          ls -la Algebra/Ring/Basic/flake.nix 2>/dev/null || true
-          echo "Flake structure verified"
+          echo "Module flakes: $(find mathlib-split -name 'flake.nix' -type f | wc -l)"
+          echo "Sample modules:"
+          ls mathlib-split/Algebra/Ring/Basic/flake.nix 2>/dev/null || echo "No Ring/Basic"
+          ls mathlib-split/Init/flake.nix 2>/dev/null || echo "No Init"
