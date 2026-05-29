@@ -55,4 +55,4 @@ GitHub Actions workflow validates building and publishes changes.
 
 ## License
 
-Apache 2.0 (same as Mathlib)
+AGPL v3
