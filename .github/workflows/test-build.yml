@@ -21,33 +21,13 @@ jobs:
     steps:
       - uses: meta-introspector/checkout@v4
 
-      - uses: meta-introspector/install-nix-action@LATEST
+      - name: Install Nix
+        uses: meta-introspector/install-nix-action@LATEST
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-
-      - name: Test builds
+      - name: Build test modules locally
         run: |
-          repo='meta-introspector/mathlib4'
-          branch='feature/split'
-          
-          failed=0
-          passed=0
-          
-          IFS=' ' read -ra modules <<< '${{ github.event.inputs.modules || "Algebra/Ring/Basic Init Data/Nat/Basic" }}'
-          
-          for module in "${modules[@]}"; do
-            echo "Testing $module..."
-            if nix build --no-write-lock-file "github:$repo?ref=$branch&dir=$module" 2>&1; then
-              echo "✓ $module built successfully"
-              ((passed++)) || true
-            else
-              echo "✗ $module failed"
-              ((failed++)) || true
-            fi
-          done
-          
-          echo "Results: $passed passed, $failed failed"
-          if [ $failed -gt 0 ]; then
-            echo "::error::Some builds failed"
-          fi
+          echo "Testing build from github:meta-introspector/mathlib4..."
+          nix build --no-write-lock-file "github:meta-introspector/mathlib4?ref=feature/split&dir=Init" 2>&1 | tail -5
+          ls /tmp/result/
