@@ -264,7 +264,7 @@ function downloadNix() {
     alert('No modules selected. Click on modules to select them.');
     return;
   }
-  const cmd = 'nix build ' + sel.map(m => `\`github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace(".", "/")}\``).join(' \\\n  ');
+  const cmd = 'nix build ' + sel.map(m => `"github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace(".", "/")}"`).join(' \\\n  ') + ' --no-write-lock-file';
   showOutput(cmd);
 }
 function generateFlake() {
@@ -273,29 +273,30 @@ function generateFlake() {
     alert('No modules selected. Click on modules to select them.');
     return;
   }
-  let flakeContent = `{
-  description = "Generated mathlib module flake";
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-`;
+  let flakeLines = [
+    '{',
+    '  description = "Generated mathlib module flake";',
+    '  inputs = {',
+    '    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";'
+  ];
   for (const m of sel) {
-    const modName = m.replace(/\\./g, '_').replace(/-/g, '_');
-    flakeContent += `    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";\n`;
+    const modName = m.replace(/\./g, '_').replace(/-/g, '_');
+    flakeLines.push(`    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";`);
   }
-  flakeContent += `  };
-  outputs = { self, nixpkgs, ... }@inputs:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      packages.${system}.default = pkgs.stdenv.mkDerivation {
-        pname = "mathlib-modules";
-        version = "0.1.0";
-        src = ./.;
-      };
-    };
-}`;
-  showOutput(flakeContent);
+  flakeLines.push('  };');
+  flakeLines.push('  outputs = { self, nixpkgs, ... }@inputs:');
+  flakeLines.push('    let');
+  flakeLines.push('      system = "x86_64-linux";');
+  flakeLines.push('      pkgs = nixpkgs.legacyPackages.${system};');
+  flakeLines.push('    in {');
+  flakeLines.push('      packages.${system}.default = pkgs.stdenv.mkDerivation {');
+  flakeLines.push('        pname = "mathlib-modules";');
+  flakeLines.push('        version = "0.1.0";');
+  flakeLines.push('        src = ./.;');
+  flakeLines.push('      };');
+  flakeLines.push('    };');
+  flakeLines.push('}');
+  showOutput(flakeLines.join('\n'));
 }
 </script>
 </div>
