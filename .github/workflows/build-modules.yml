@@ -4,25 +4,23 @@ on:
   workflow_dispatch:
     inputs:
       modules:
-        description: 'Specific modules to build'
+        description: 'Modules to build (space-separated, e.g., "Algebra/Ring/Basic GroupTheory/*")'
         required: false
-        default: ''
-      pattern:
-        description: 'Pattern to match modules (e.g., Algebra/Group, Ring/*)'
+        default: 'Algebra/Ring/Basic Init Data/Nat/Basic'
+      repo:
+        description: 'GitHub repo (owner/repo)'
         required: false
-        default: ''
-      max-modules:
-        description: 'Max modules to build'
+        default: 'meta-introspector/mathlib4'
+      branch:
+        description: 'Branch with modular flakes'
         required: false
-        default: '20'
+        default: 'feature/split'
 
 jobs:
   build-modules:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      actions: read
-      packages: write
 
     steps:
       - uses: meta-introspector/checkout@v4
@@ -32,31 +30,9 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Build modules
-        run: |
-          repo='meta-introspector/mathlib4'
-          branch='feature/split'
-          mkdir -p outputs
-          count=0
-          
-          modules=(Algebra/Ring/Basic Init Data/Nat/Basic Algebra/Group/Basic)
-          
-          for module in "${modules[@]}"; do
-            echo "Building $module..."
-            nix build --no-write-lock-file "github:$repo?ref=$branch&dir=$module" 2>&1 | tail -3 || echo "Build skipped for $module"
-            if [ -f /tmp/result/*.lean ]; then
-              cp /tmp/result/*.lean outputs/ 2>/dev/null || true
-              ((count++)) || true
-            fi
-          done
-          echo "Built $count modules"
-
-      - name: Store built modules
-        run: |
-          echo "Built modules stored in outputs/"
-          ls outputs/ || echo "No outputs yet"
-
-      - name: Show download instructions
-        run: |
-          echo "Download modules with:"
-          echo "nix build 'github:meta-introspector/mathlib4?ref=feature/split&dir=ModuleName'"
+      - uses: meta-introspector/lean-split-tool/.github/actions/lean4-split
+        id: build
+        with:
+          modules: ${{ github.event.inputs.modules }}
+          repo: ${{ github.event.inputs.repo }}
+          branch: ${{ github.event.inputs.branch }}
