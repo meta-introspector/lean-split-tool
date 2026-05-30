@@ -71,16 +71,18 @@ h1 { color: #333; }
 .module { padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #eee; }
 .module:hover { background: #e3f2fd; }
 .module.selected { background: #2196f3; color: white; }
-.btn { background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+.btn { background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
 .btn:hover { background: #1976d2; }
 #selected { margin-top: 20px; padding: 10px; background: white; border-radius: 8px; }
+pre { background: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; }
+code { font-family: monospace; }
 </style>
 </head>
 <body>
 <div class="container">
 <h1>Lean Mathlib Module Selector</h1>
-<p>Select modules to build. Dependencies are shown in the graph below.</p>
-<input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules...">
+<p>Select modules to build. <a href="llm.txt">LLM Instructions</a> | Dependency graph: <a href="modules.dot">modules.dot</a></p>
+<input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules (e.g., Algebra, Graph, SimpleGraph)...">
 <div class="module-tree" id="modules">
 """
     for prefix in sorted(modules_by_prefix.keys()):
@@ -93,7 +95,12 @@ h1 { color: #333; }
 <div id="selected">
 <h3>Selected Modules</h3>
 <p id="selection"></p>
-<button class="btn" onclick="downloadNix()">Download Nix Build Command</button>
+<button class="btn" onclick="downloadNix()">Generate Nix Commands</button>
+<button class="btn" onclick="generateFlake()">Generate Flake.nix</button>
+</div>
+<div id="output" style="margin-top: 20px; display: none;">
+<h3>Generated Output</h3>
+<pre id="result"><code></code></pre>
 </div>
 <script>
 function toggle(el) {
@@ -112,8 +119,46 @@ function filterModules() {
 }
 function downloadNix() {
   const sel = Array.from(document.querySelectorAll('.module.selected')).map(m => m.dataset.name);
+  if (sel.length === 0) {
+    alert('No modules selected. Click on modules to select them.');
+    return;
+  }
   const cmd = 'nix build ' + sel.map(m => `\`github:meta-introspector/mathlib4?ref=feature/split&dir=\${m.replace(".", "/")}\``).join(' \\\n  ');
-  alert('Nix command:\\n' + cmd);
+  showOutput(cmd);
+}
+function generateFlake() {
+  const sel = Array.from(document.querySelectorAll('.module.selected')).map(m => m.dataset.name);
+  if (sel.length === 0) {
+    alert('No modules selected. Click on modules to select them.');
+    return;
+  }
+  let flake = `{
+  description = "Generated mathlib module flake";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+`;
+  for (const m of sel) {
+    const modName = m.replace(/\./g, '_').replace(/-/g, '_');
+    flake += `    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";\n`;
+  }
+  flake += `  };
+  outputs = { self, nixpkgs, ... }@inputs:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      packages.${system}.default = pkgs.stdenv.mkDerivation {
+        pname = "mathlib-modules";
+        version = "0.1.0";
+        src = ./.;
+      };
+    };
+}`;
+  showOutput(flake);
+}
+function showOutput(content) {
+  document.getElementById('result').textContent = content;
+  document.getElementById('output').style.display = 'block';
 }
 </script>
 </div>

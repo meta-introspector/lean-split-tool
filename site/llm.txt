@@ -1,0 +1,49 @@
+# Lean Mathlib Split - LLM Instructions
+
+This site provides an interactive module selector for Lean4 mathlib with Nix flake generation.
+
+## Quick Start
+
+1. Visit https://meta-introspector.github.io/lean-split-tool/
+2. Search for modules using the search box
+3. Click modules to select them (they turn blue when selected)
+4. Click "Download Nix Build Command" to get the build command
+
+## Module Categories
+
+- Algebra: Ring, Group, Module, Polynomial theories
+- Analysis: Real, Complex, Normed spaces
+- Combinatorics: SimpleGraph, Quiver, Enumerative
+- Data: Nat, Int, List, Finset operations
+- Tactic: Proof automation and tactics
+- Logic: Propositions, Relations, Classical logic
+
+## Nix Flake Format
+
+```
+github:meta-introspector/mathlib4?ref=feature/split&dir=ModuleName
+```
+
+Example: `github:meta-introspector/mathlib4?ref=feature/split&dir=Algebra/Ring/Basic`
+
+## GitHub Action Usage
+
+```yaml
+- uses: meta-introspector/lean-split-tool/.github/actions/lean4-split
+  with:
+    modules: "Algebra/Ring/Basic Combinatorics/SimpleGraph/Basic Init"
+```
+
+## Programmatic Access
+
+All 7648 modules are available as individual Nix flakes at:
+- Base URL: `github:meta-introspector/mathlib4?ref=feature/split`
+- Each module path maps to `dir=ModuleName` parameter
+
+## Dependency Graph
+
+See `modules.dot` for full dependency graph. Root modules (no deps) build first.
+
+## License
+
+AGPL v3 - Free to use and modify
