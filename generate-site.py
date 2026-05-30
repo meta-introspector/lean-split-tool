@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import json
 from collections import defaultdict
 
 SOURCE_DIR = "/mnt/data1/time-2026/03-march/23/voa-borcherds-archive/mathlib4/Mathlib"
@@ -48,9 +49,59 @@ def generate_dot(graph, all_modules):
     return dot
 
 
+def generate_3d_html(graph, all_modules):
+    """Generate interactive 3D graph using vis.js"""
+    nodes = [
+        {"id": m, "label": m, "level": m.count(".")} for m in list(all_modules)[:5000]
+    ]
+    edges = [
+        {"from": d, "to": m}
+        for m, deps in graph.items()
+        for d in deps
+        if d in all_modules
+    ][:10000]
+
+    with open(os.path.join(OUTPUT_DIR, "graph-data.json"), "w") as f:
+        json.dump({"nodes": nodes, "edges": edges}, f)
+
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<title>Mathlib 3D Dependency Graph</title>
+<style>
+body {{ margin: 0; font-family: sans-serif; }}
+#graph3d {{ width: 100vw; height: 100vh; }}
+.overlay {{ position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; }}
+</style>
+</head>
+<body>
+<div class="overlay">
+<h3>3D Mathlib Dependency Graph</h3>
+<p>Drag to rotate, scroll to zoom. <a href="index.html">Back to selector</a></p>
+</div>
+<div id="graph3d"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis.js/9.1.6/vis-network.min.js"></script>
+<script>
+fetch('graph-data.json').then(r => r.json()).then(data => {{
+  var nodes = new vis.DataSet(data.nodes);
+  var edges = new vis.DataSet(data.edges);
+  var container = document.getElementById('graph3d');
+  var networkData = {{ nodes: nodes, edges: edges }};
+  var options = {{
+    physics: {{ stabilization: false }},
+    interaction: {{ hover: true }},
+    nodes: {{ font: {{ size: 12 }} }}
+  }};
+  var network = new vis.Network(container, networkData, options);
+}});
+</script>
+</body>
+</html>
+"""
+
+
 def generate_tree_html(graph, all_modules):
     """Generate interactive HTML tree from DOT dependency graph"""
-    # Build reverse graph (what depends on what)
     depended_on = defaultdict(set)
     for m, deps in graph.items():
         for d in deps:
@@ -82,21 +133,19 @@ h1 { color: #333; }
 <div class="tree" id="tree">
 """
 
-    # Find root modules (no incoming edges in the original graph, i.e., no dependencies)
     roots = [
         m for m in all_modules if m not in {d for deps in graph.values() for d in deps}
     ]
 
     def render_tree(modules, depth=0):
         result = ""
-        for m in sorted(modules)[:100]:  # Limit for performance
+        for m in sorted(modules)[:100]:
             children = depended_on.get(m, set())
             result += f'<div class="tree-node" style="padding-left: {depth * 30}px">'
             if children:
                 result += (
                     f'<span class="tree-toggle" onclick="toggleTree(this)">▶</span> '
                 )
-            mod_path = m.replace(".", "/")
             result += (
                 f'<a class="module-link" href="index.html#{m}" data-name="{m}">{m}</a>'
             )
@@ -162,14 +211,14 @@ h1 { color: #333; }
 <body>
 <div class="container">
 <h1>Lean Mathlib Module Selector</h1>
-<p>Select modules to build. <a href="llm.txt">LLM Instructions</a> | Dependency tree: <a href="tree.html">tree.html</a> | DOT graph: <a href="modules.dot">modules.dot</a></p>
+<p>Select modules to build. <a href="llm.txt">LLM Instructions</a> | <a href="graph3d.html">3D Graph</a> | <a href="tree.html">Tree</a> | <a href="modules.dot">DOT</a></p>
 
 <div id="output" class="output-box" style="display: none;">
 <h3>Generated Output</h3>
 <div class="output-content" id="result"></div>
 </div>
 
-<input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules (e.g., Algebra, Graph, SimpleGraph)...">
+<input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules (e.g., Algebra.GradedMonoid, Graph)...">
 <div class="module-tree" id="modules">
 """
     for prefix in sorted(modules_by_prefix.keys()):
@@ -226,7 +275,7 @@ function generateFlake() {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 `;
   for (const m of sel) {
-    const modName = m.replace(/\./g, '_').replace(/-/g, '_');
+    const modName = m.replace(/\\./g, '_').replace(/-/g, '_');
     flakeContent += `    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";\n`;
   }
   flakeContent += `  };
@@ -264,5 +313,8 @@ if __name__ == "__main__":
 
     with open(os.path.join(OUTPUT_DIR, "tree.html"), "w") as f:
         f.write(generate_tree_html(graph, all_modules))
+
+    with open(os.path.join(OUTPUT_DIR, "graph3d.html"), "w") as f:
+        f.write(generate_3d_html(graph, all_modules))
 
     print(f"Generated {len(all_modules)} modules in {OUTPUT_DIR}/")

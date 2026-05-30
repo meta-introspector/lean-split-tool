@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mathlib 3D Dependency Graph</title>
+<style>
+body { margin: 0; font-family: sans-serif; }
+#graph3d { width: 100vw; height: 100vh; }
+.overlay { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="overlay">
+<h3>3D Mathlib Dependency Graph</h3>
+<p>Drag to rotate, scroll to zoom. <a href="index.html">Back to selector</a></p>
+</div>
+<div id="graph3d"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis.js/9.1.6/vis-network.min.js"></script>
+<script>
+fetch('graph-data.json').then(r => r.json()).then(data => {
+  var nodes = new vis.DataSet(data.nodes);
+  var edges = new vis.DataSet(data.edges);
+  var container = document.getElementById('graph3d');
+  var networkData = { nodes: nodes, edges: edges };
+  var options = {
+    physics: { stabilization: false },
+    interaction: { hover: true },
+    nodes: { font: { size: 12 } }
+  };
+  var network = new vis.Network(container, networkData, options);
+});
+</script>
+</body>
+</html>
