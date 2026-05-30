@@ -68,6 +68,24 @@ Each module references its prior dependencies via the lattice.
 
 GitHub Actions workflow validates building and publishes changes.
 
+## GitHub Pages Site
+
+Interactive module selector available at: https://meta-introspector.github.io/lean-split-tool/
+
+Features:
+- Search and select modules from 7648 available
+- Click modules to select them
+- "Download Nix Build Command" button generates build commands
+- Graph Theory modules: `Combinatorics.SimpleGraph.Basic`, `Combinatorics.SimpleGraph.Coloring`, etc.
+
+## GitHub Action
+
+```yaml
+- uses: meta-introspector/lean-split-tool/.github/actions/lean4-split
+  with:
+    modules: "Algebra/Ring/Basic Init Data/Nat/Basic"
+```
+
 ## License
 
 AGPL v3
