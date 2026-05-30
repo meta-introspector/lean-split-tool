@@ -39,13 +39,7 @@ jobs:
           mkdir -p outputs
           count=0
           
-          if [ -n '${{ github.event.inputs.modules }}' ]; then
-            modules=(${{ inputs.modules }})
-          elif [ -n '${{ github.event.inputs.pattern }}' ]; then
-            modules=($(ls mathlib-split/${{ inputs.pattern }}/flake.nix 2>/dev/null | xargs -n1 dirname | head -${{ inputs.max-modules }}))
-          else
-            modules=(Algebra/Ring/Basic Init Data/Nat/Basic Algebra/Group/Basic)
-          fi
+          modules=(Algebra/Ring/Basic Init Data/Nat/Basic Algebra/Group/Basic)
           
           for module in "${modules[@]}"; do
             echo "Building $module..."
@@ -57,10 +51,7 @@ jobs:
           done
           echo "Built $count modules"
 
-      - name: Upload built modules
-        uses: actions/upload-artifact@v4
-        with:
-          name: mathlib-modules
-          path: outputs/
-          retention-days: 7
-          if-no-files-found: ignore
+      - name: Store built modules
+        run: |
+          echo "Built modules stored in outputs/"
+          ls outputs/
