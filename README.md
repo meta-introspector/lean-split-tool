@@ -75,7 +75,7 @@ Interactive module selector available at: https://meta-introspector.github.io/le
 Features:
 - Search and select modules from 7648 available
 - Click modules to select them
-- "Download Nix Build Command" button generates build commands
+- Generate Nix build commands for selected modules
 - Graph Theory modules: `Combinatorics.SimpleGraph.Basic`, `Combinatorics.SimpleGraph.Coloring`, etc.
 
 ## GitHub Action
