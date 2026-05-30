@@ -148,22 +148,27 @@ def generate_html(graph, all_modules):
 body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
 .container { max-width: 1200px; margin: 0 auto; }
 h1 { color: #333; }
+.output-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.output-content { background: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; font-family: monospace; white-space: pre; }
 .search-box { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
-.module-tree { background: white; padding: 20px; border-radius: 8px; }
+.module-tree { background: white; padding: 20px; border-radius: 8px; max-height: 600px; overflow-y: auto; }
 .module { padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #eee; }
 .module:hover { background: #e3f2fd; }
 .module.selected { background: #2196f3; color: white; }
 .btn { background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
 .btn:hover { background: #1976d2; }
-#selected { margin-top: 20px; padding: 10px; background: white; border-radius: 8px; }
-pre { background: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; }
-code { font-family: monospace; }
 </style>
 </head>
 <body>
 <div class="container">
 <h1>Lean Mathlib Module Selector</h1>
 <p>Select modules to build. <a href="llm.txt">LLM Instructions</a> | Dependency tree: <a href="tree.html">tree.html</a> | DOT graph: <a href="modules.dot">modules.dot</a></p>
+
+<div id="output" class="output-box" style="display: none;">
+<h3>Generated Output</h3>
+<div class="output-content" id="result"></div>
+</div>
+
 <input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules (e.g., Algebra, Graph, SimpleGraph)...">
 <div class="module-tree" id="modules">
 """
@@ -174,15 +179,11 @@ code { font-family: monospace; }
             html += f'<div class="module" onclick="toggle(this)" data-name="{m}">{m} <small>({deps}...)</small></div>\n'
 
     html += """</div>
-<div id="selected">
-<h3>Selected Modules</h3>
+<div style="margin-top: 20px; padding: 10px; background: white; border-radius: 8px;">
+<h3>Selected Modules (<span id="count">0</span>)</h3>
 <p id="selection"></p>
 <button class="btn" onclick="downloadNix()">Generate Nix Commands</button>
 <button class="btn" onclick="generateFlake()">Generate Flake.nix</button>
-</div>
-<div id="output" style="margin-top: 20px; display: none;">
-<h3>Generated Output</h3>
-<pre id="result"><code></code></pre>
 </div>
 <script>
 function toggle(el) {
@@ -192,6 +193,7 @@ function toggle(el) {
 function updateSelection() {
   const sel = Array.from(document.querySelectorAll('.module.selected')).map(m => m.dataset.name);
   document.getElementById('selection').textContent = sel.join(', ') || 'None selected';
+  document.getElementById('count').textContent = sel.length;
 }
 function filterModules() {
   const term = document.getElementById('search').value.toLowerCase();
@@ -199,13 +201,17 @@ function filterModules() {
     m.style.display = m.dataset.name.toLowerCase().includes(term) ? '' : 'none';
   });
 }
+function showOutput(content) {
+  document.getElementById('result').textContent = content;
+  document.getElementById('output').style.display = 'block';
+}
 function downloadNix() {
   const sel = Array.from(document.querySelectorAll('.module.selected')).map(m => m.dataset.name);
   if (sel.length === 0) {
     alert('No modules selected. Click on modules to select them.');
     return;
   }
-  const cmd = 'nix build ' + sel.map(m => `\`github:meta-introspector/mathlib4?ref=feature/split&dir=\${m.replace(".", "/")}\``).join(' \\\n  ');
+  const cmd = 'nix build ' + sel.map(m => `\`github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace(".", "/")}\``).join(' \\\n  ');
   showOutput(cmd);
 }
 function generateFlake() {
@@ -214,16 +220,16 @@ function generateFlake() {
     alert('No modules selected. Click on modules to select them.');
     return;
   }
-  let flake = `{
+  let flakeContent = `{
   description = "Generated mathlib module flake";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 `;
   for (const m of sel) {
     const modName = m.replace(/\./g, '_').replace(/-/g, '_');
-    flake += `    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";\n`;
+    flakeContent += `    ${modName}.url = "github:meta-introspector/mathlib4?ref=feature/split&dir=${m.replace('.', '/')}";\n`;
   }
-  flake += `  };
+  flakeContent += `  };
   outputs = { self, nixpkgs, ... }@inputs:
     let
       system = "x86_64-linux";
@@ -236,11 +242,7 @@ function generateFlake() {
       };
     };
 }`;
-  showOutput(flake);
-}
-function showOutput(content) {
-  document.getElementById('result').textContent = content;
-  document.getElementById('output').style.display = 'block';
+  showOutput(flakeContent);
 }
 </script>
 </div>
