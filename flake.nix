@@ -10,6 +10,12 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      
+      submoduleDirs = [
+        "mathlib-split/Algebra/Ring/Basic"
+        "mathlib-split/Init"
+        "mathlib-split/Data/Nat/Basic"
+      ];
     in
     {
       apps.${system}.generate-split = {

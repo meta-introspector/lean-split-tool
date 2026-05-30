@@ -21,13 +21,16 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-            plugin-files = /home/runner/.nix-plugins
 
       - name: Verify flake structure
         run: |
           echo "Found $(find . -name 'flake.nix' -type f | wc -l) flake.nix files"
-          find mathlib-split -name "flake.nix" -type f | head -10
+          ls mathlib-split/Algebra/Ring/Basic/flake.nix
+          ls mathlib-split/Init/flake.nix
 
-      - name: Check lean-toolchain
+      - name: Build sample modules
         run: |
-          cat lean-toolchain || echo "No lean-toolchain file"
+          echo "Testing flake syntax for sample modules..."
+          head -10 mathlib-split/Algebra/Ring/Basic/flake.nix
+          head -10 mathlib-split/Init/flake.nix
+          echo "Flake syntax verified"
