@@ -54,4 +54,9 @@ jobs:
       - name: Store built modules
         run: |
           echo "Built modules stored in outputs/"
-          ls outputs/
+          ls outputs/ || echo "No outputs yet"
+
+      - name: Show download instructions
+        run: |
+          echo "Download modules with:"
+          echo "nix build 'github:meta-introspector/mathlib4?ref=feature/split&dir=ModuleName'"
