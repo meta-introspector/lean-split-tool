@@ -1,0 +1,55 @@
+name: 'flake-generator'
+description: 'Generate Nix flakes for selected Lean modules with dependency resolution'
+inputs:
+  modules:
+    description: 'Space-separated modules to include (e.g., "Algebra/Ring/Basic Init")'
+    required: true
+    default: ''
+  repo:
+    description: 'Source repo for modules'
+    required: false
+    default: 'meta-introspector/mathlib4'
+  branch:
+    description: 'Branch with modular flakes'
+    required: false
+    default: 'feature/split'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate flake.nix
+      shell: bash
+      run: |
+        repo='${{ inputs.repo }}'
+        branch='${{ inputs.branch }}'
+        
+        echo "Generating flake.nix for modules: ${{ inputs.modules }}"
+        
+        cat > flake.nix << 'EOF'
+{
+  description = "Generated mathlib module flake";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+EOF
+        
+        for module in ${{ inputs.modules }}; do
+          mod_name=$(echo "$module" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+          echo "    ${mod_name}.url = \"github:${repo}?ref=${branch}&dir=${module}\";" >> flake.nix
+        done
+        
+        echo "  };" >> flake.nix
+        echo "  outputs = { self, nixpkgs, ... }@inputs:" >> flake.nix
+        echo "    let" >> flake.nix
+        echo "      system = \"x86_64-linux\";" >> flake.nix
+        echo "      pkgs = nixpkgs.legacyPackages.\${system};" >> flake.nix
+        echo "    in {" >> flake.nix
+        echo "      packages.\${system}.default = pkgs.stdenv.mkDerivation {" >> flake.nix
+        echo "        pname = \"mathlib-modules\";" >> flake.nix
+        echo "        version = \"0.1.0\";" >> flake.nix
+        echo "        src = ./.;" >> flake.nix
+        echo "      };" >> flake.nix
+        echo "    };" >> flake.nix
+        echo "}" >> flake.nix
+        
+        echo "Generated flake.nix"
+        cat flake.nix
