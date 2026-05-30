@@ -28,10 +28,10 @@ jobs:
       - name: Generate site
         run: python3 generate-site.py
 
-      - name: Prepare for deployment
-        uses: meta-introspector/configure-pages@v5
+      - name: Upload artifact
+        uses: meta-introspector/upload-pages-artifact@v3
         with:
-          static_site: ./site
+          path: ./site
 
   deploy:
     environment:
