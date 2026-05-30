@@ -18,7 +18,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Setup Python
         uses: meta-introspector/setup-python@v5
@@ -29,7 +33,7 @@ jobs:
         run: python3 generate-site.py
 
       - name: Upload artifact
-        uses: meta-introspector/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
 
