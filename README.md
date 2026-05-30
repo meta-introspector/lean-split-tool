@@ -86,6 +86,28 @@ Features:
     modules: "Algebra/Ring/Basic Init Data/Nat/Basic"
 ```
 
+## CLI Client
+
+```bash
+# Use from anywhere
+nix run github:meta-introspector/lean-split-tool
+
+# List all modules
+nix run github:meta-introspector/lean-split-tool -- list
+
+# Search for modules
+nix run github:meta-introspector/lean-split-tool -- search Graph
+
+# Generate nix build commands
+nix run github:meta-introspector/lean-split-tool -- nix "Combinatorics.SimpleGraph.Basic Init"
+
+# Generate flake.nix for selected modules
+nix run github:meta-introspector/lean-split-tool -- flake "Init Algebra.Ring.Basic" -o flake.nix
+
+# Split a custom mathlib fork
+nix run github:meta-introspector/lean-split-tool -- split /path/to/my-fork --repo myfork/mathlib4
+```
+
 ## License
 
 AGPL v3
