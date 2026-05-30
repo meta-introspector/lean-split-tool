@@ -4,7 +4,7 @@ import re
 from collections import defaultdict
 
 SOURCE_DIR = "/mnt/data1/time-2026/03-march/23/voa-borcherds-archive/mathlib4/Mathlib"
-REPO_PATH = "/mnt/data1/git/github.com/leanprover-community/mathlib4.git"
+REPO_PATH = "github:meta-introspector/mathlib4"
 BRANCH = "feature/split"
 
 
@@ -70,7 +70,7 @@ def build_modules(module_list):
     built = 0
     for module in module_list:
         module_path = get_module_path(module)
-        url = f"git+file://{REPO_PATH}?ref={BRANCH}&dir={module_path}"
+        url = f"github:meta-introspector/mathlib4?ref={BRANCH}&dir={module_path}"
         print(f"Building {module} -> {url}")
         os.system(f"nix build --no-write-lock-file '{url}' 2>&1 | tail -3")
         built += 1

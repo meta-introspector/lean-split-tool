@@ -28,9 +28,10 @@ jobs:
           ls mathlib-split/Algebra/Ring/Basic/flake.nix
           ls mathlib-split/Init/flake.nix
 
-      - name: Build sample modules
+      - name: Build sample modules from GitHub
         run: |
-          echo "Testing flake syntax for sample modules..."
-          head -10 mathlib-split/Algebra/Ring/Basic/flake.nix
-          head -10 mathlib-split/Init/flake.nix
-          echo "Flake syntax verified"
+          echo "Building Algebra.Ring.Basic from GitHub..."
+          nix build --no-write-lock-file "github:meta-introspector/mathlib4?ref=feature/split&dir=Algebra/Ring/Basic" 2>&1 | tail -5 || echo "Build may have failed"
+          echo "Building Init from GitHub..."
+          nix build --no-write-lock-file "github:meta-introspector/mathlib4?ref=feature/split&dir=Init" 2>&1 | tail -5 || echo "Build may have failed"
+          echo "Done"

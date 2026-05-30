@@ -5,19 +5,19 @@ Tool to generate Nix flakes for each Lean module in Mathlib, enabling modular bu
 ## Quick Start
 
 ```bash
-# Generate and publish modular flakes to bare repo
+# Generate and publish modular flakes to meta-introspector/mathlib4 fork
 nix run .#generate-split
 
-# Build any module afterward
-nix build "git+file:///mnt/data1/git/github.com/leanprover-community/mathlib4/?ref=feature/split&dir=Algebra/Ring/Basic"
+# Build any module from the fork
+nix build "github:meta-introspector/mathlib4?ref=feature/split&dir=Algebra/Ring/Basic"
 ```
 
 ## Structure
 
-- `split-mathlib.sh` - Publish modular flakes to bare git repo
+- `split-mathlib.sh` - Publish modular flakes to meta-introspector/mathlib4 fork
 - `SplitDecls.lean` - Lean program for per-declaration lattice splitting
 - `generate.py` - Python script to generate flakes locally
-- `topological-build.py` - Build modules in dependency order via git+file URLs
+- `topological-build.py` - Build modules in topological order via GitHub URLs
 - `generate-lattice.py` - Generate flakes with input dependencies for lattice structure
 - `.github/workflows/build.yml` - GitHub Actions CI
 
@@ -26,16 +26,16 @@ nix build "git+file:///mnt/data1/git/github.com/leanprover-community/mathlib4/?r
 ### Generate flakes
 ```bash
 nix run .#generate-split
-# Pushes to feature/split branch in bare repo
+# Pushes to feature/split branch in meta-introspector/mathlib4
 ```
 
-### Build modules
+### Build modules from GitHub
 ```bash
 # Build single module
-nix build "git+file:///mnt/data1/git/github.com/leanprover-community/mathlib4/?ref=feature/split&dir=Data/Nat/Basic"
+nix build "github:meta-introspector/mathlib4?ref=feature/split&dir=Data/Nat/Basic"
 
-# Build from local generated flakes
-nix build .#path/to/module
+# Build Init module
+nix build "github:meta-introspector/mathlib4?ref=feature/split&dir=Init"
 ```
 
 ### Topological build (dependency order)
@@ -48,21 +48,21 @@ nix run .#topological-build
 
 Modules are built in dependency order:
 - Root modules (no imports) are built first: `Tactic.Linter.DirectoryDependency`
-- Modules importing `Init` come later: `Algebra.Expr`, `Logic.OpClass`, etc.
+- Modules importing `Init` come later: `Tactic.Eqns`, `Tactic.Variable`, etc.
 - Final modules depend on many others: `Tactic` (323 imports), `Analysis.Normed.Module.FiniteDimension` (14 imports)
 
 ## Per-Declaration Lattice
 
-The `SplitDecls.lean` tool creates flakes with dependencies:
+The `generate-lattice.py` tool creates flakes with dependencies:
 
 ```nix
 inputs = {
   nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  Dep-Name.url = "git+file:///mnt/data1/git/github.com/leanprover-community/mathlib4/?ref=feature/split&dir=Dep/Path";
+  DepName = "github:meta-introspector/mathlib4?ref=feature/split&dir=DepPath";
 };
 ```
 
-Each declaration references its prior dependencies via the lattice.
+Each module references its prior dependencies via the lattice.
 
 ## CI/CD
 
