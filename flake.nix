@@ -38,6 +38,8 @@
         program = "${pkgs.python3}/bin/python3 ${./lean-split-cli.py}";
       };
       
+      apps.${system}.default = apps.${system}.lean-split-cli;
+      
       apps.${system}.generate-site = {
         type = "app";
         program = "${pkgs.python3}/bin/python3 ${./generate-site.py}";

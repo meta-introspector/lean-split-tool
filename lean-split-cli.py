@@ -70,16 +70,26 @@ def main():
     )
     parser.add_argument(
         "command",
-        choices=["list", "search", "nix", "flake", "build"],
+        choices=["list", "search", "nix", "flake", "build", "split"],
         help="Command to run",
     )
     parser.add_argument(
-        "query", nargs="?", help="Search term or module list (space-separated)"
+        "query", nargs="?", help="Search term, module list, or path (for split)"
     )
     parser.add_argument(
         "--dot", default="site/modules.dot", help="Path to modules.dot file"
     )
     parser.add_argument("--output", "-o", help="Output file for flake generation")
+    parser.add_argument(
+        "--repo",
+        default="meta-introspector/mathlib4",
+        help="Custom mathlib fork (owner/repo format)",
+    )
+    parser.add_argument(
+        "--branch",
+        default="feature/split",
+        help="Branch for modular flakes",
+    )
 
     args = parser.parse_args()
 
@@ -117,7 +127,6 @@ def main():
             print("Error: module list required")
             sys.exit(1)
         selected = args.query.split()
-        # Filter to valid modules
         valid = [
             m for m in selected if m in modules or any(m in mod for mod in modules)
         ]
@@ -125,7 +134,7 @@ def main():
             print(f"No valid modules found in: {args.query}")
             print("Use 'search <term>' to find modules")
             sys.exit(1)
-        print(generate_nix_cmd(valid))
+        print(generate_nix_cmd(valid, args.repo, args.branch))
 
     elif args.command == "flake":
         if not args.query:
@@ -135,13 +144,70 @@ def main():
         valid = [
             m for m in selected if m in modules or any(m in mod for mod in modules)
         ]
-        content = generate_flake(valid)
+        content = generate_flake(valid, args.repo, args.branch)
         if args.output:
             with open(args.output, "w") as f:
                 f.write(content)
             print(f"Written to {args.output}")
         else:
             print(content)
+
+    elif args.command == "split":
+        if not args.query:
+            print("Error: path to mathlib source required")
+            print(
+                "Usage: nix run .#lean-split-cli split /path/to/mathlib --repo owner/repo"
+            )
+            sys.exit(1)
+        print(f"Splitting mathlib at: {args.query}")
+        print(f"Target: {args.repo}#{args.branch}")
+        # Run generate-site.py with custom source
+        import subprocess
+
+        result = subprocess.run(
+            ["python3", "generate-site.py", args.query, args.repo, args.branch],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+        )
+        sys.exit(result.returncode)
+
+
+def generate_nix_cmd(modules, repo=None, branch=None):
+    """Generate nix build commands"""
+    repo = repo or "meta-introspector/mathlib4"
+    branch = branch or "feature/split"
+    return "nix build " + " \\\n  ".join(
+        f"github:{repo}?ref={branch}&dir={m.replace('.', '/')}" for m in modules
+    )
+
+
+def generate_flake(modules, repo=None, branch=None):
+    """Generate flake.nix content"""
+    repo = repo or "meta-introspector/mathlib4"
+    branch = branch or "feature/split"
+    inputs = [f'    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";']
+    for m in modules:
+        mod_name = m.replace(".", "_").replace("-", "_")
+        inputs.append(
+            f'    {mod_name}.url = "github:{repo}?ref={branch}&dir={m.replace(".", "/")}";'
+        )
+
+    return f"""{{
+  description = "Generated mathlib module flake";
+  inputs = {{
+{chr(10).join(inputs)}
+  }};
+  outputs = {{ self, nixpkgs, ... }}@inputs:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${{system}};
+    in {{
+      packages.${{system}}.default = pkgs.stdenv.mkDerivation {{
+        pname = "mathlib-modules";
+        version = "0.1.0";
+        src = ./.;
+      }};
+    }};
+}}"""
 
 
 if __name__ == "__main__":
