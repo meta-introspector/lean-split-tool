@@ -199,13 +199,14 @@ body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
 h1 { color: #333; }
 .output-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
 .output-content { background: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; font-family: monospace; white-space: pre; }
+.btn { background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+.btn:hover { background: #1976d2; }
 .search-box { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
 .module-tree { background: white; padding: 20px; border-radius: 8px; max-height: 600px; overflow-y: auto; }
 .module { padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #eee; }
 .module:hover { background: #e3f2fd; }
 .module.selected { background: #2196f3; color: white; }
-.btn { background: #2196f3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
-.btn:hover { background: #1976d2; }
+.controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
 </style>
 </head>
 <body>
@@ -213,9 +214,15 @@ h1 { color: #333; }
 <h1>Lean Mathlib Module Selector</h1>
 <p>Select modules to build. <a href="llm.txt">LLM Instructions</a> | <a href="graph3d.html">3D Graph</a> | <a href="tree.html">Tree</a> | <a href="modules.dot">DOT</a></p>
 
-<div id="output" class="output-box" style="display: none;">
-<h3>Generated Output</h3>
+<div class="controls">
+<h3>Generate Commands</h3>
+<div id="output" class="output-box" style="display: none; margin-top: 10px;">
+<h4>Output:</h4>
 <div class="output-content" id="result"></div>
+</div>
+<button class="btn" onclick="downloadNix()">Generate Nix Commands</button>
+<button class="btn" onclick="generateFlake()">Generate Flake.nix</button>
+<p id="selection" style="margin-top: 10px; color: #666;">No modules selected. Click modules below to select them.</p>
 </div>
 
 <input type="text" class="search-box" id="search" onkeyup="filterModules()" placeholder="Search modules (e.g., Algebra.GradedMonoid, Graph)...">
@@ -228,12 +235,6 @@ h1 { color: #333; }
             html += f'<div class="module" onclick="toggle(this)" data-name="{m}">{m} <small>({deps}...)</small></div>\n'
 
     html += """</div>
-<div style="margin-top: 20px; padding: 10px; background: white; border-radius: 8px;">
-<h3>Selected Modules (<span id="count">0</span>)</h3>
-<p id="selection"></p>
-<button class="btn" onclick="downloadNix()">Generate Nix Commands</button>
-<button class="btn" onclick="generateFlake()">Generate Flake.nix</button>
-</div>
 <script>
 function toggle(el) {
   el.classList.toggle('selected');
@@ -241,8 +242,11 @@ function toggle(el) {
 }
 function updateSelection() {
   const sel = Array.from(document.querySelectorAll('.module.selected')).map(m => m.dataset.name);
-  document.getElementById('selection').textContent = sel.join(', ') || 'None selected';
-  document.getElementById('count').textContent = sel.length;
+  const selEl = document.getElementById('selection');
+  if (sel.length > 0) {
+    selEl.textContent = sel.join(', ');
+    selEl.style.color = '#333';
+  }
 }
 function filterModules() {
   const term = document.getElementById('search').value.toLowerCase();
