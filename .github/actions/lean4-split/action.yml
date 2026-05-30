@@ -1,0 +1,33 @@
+name: 'lean4-split'
+description: 'Build Lean mathlib modules individually with Nix in topological order'
+inputs:
+  modules:
+    description: 'Modules or patterns to build (e.g., "Algebra/Ring/Basic" or "GroupTheory/*")'
+    required: false
+    default: ''
+  repo:
+    description: 'GitHub repo for module sources'
+    required: false
+    default: 'meta-introspector/mathlib4'
+  branch:
+    description: 'Branch with modular flakes'
+    required: false
+    default: 'feature/split'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build modules with Nix
+      shell: bash
+      run: |
+        repo='${{ inputs.repo }}'
+        branch='${{ inputs.branch }}'
+        mkdir -p outputs
+        
+        for module in ${{ inputs.modules }}; do
+          echo "Building $module..."
+          nix build --no-write-lock-file "github:$repo?ref=$branch&dir=$module" 2>&1 | tail -3
+          cp /tmp/result/*.lean outputs/ 2>/dev/null || true
+        done
+        
+        echo "Outputs available in outputs/"

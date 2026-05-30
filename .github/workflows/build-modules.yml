@@ -58,6 +58,9 @@ jobs:
           echo "Built $count modules"
 
       - name: Upload built modules
-        run: |
-          echo "Artifacts ready in outputs/"
-          ls outputs/
+        uses: actions/upload-artifact@v4
+        with:
+          name: mathlib-modules
+          path: outputs/
+          retention-days: 7
+          if-no-files-found: ignore
