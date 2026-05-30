@@ -1,0 +1,63 @@
+name: Build All Mathlib Modules
+
+on:
+  workflow_dispatch:
+    inputs:
+      modules:
+        description: 'Specific modules to build'
+        required: false
+        default: ''
+      pattern:
+        description: 'Pattern to match modules (e.g., Algebra/Group, Ring/*)'
+        required: false
+        default: ''
+      max-modules:
+        description: 'Max modules to build'
+        required: false
+        default: '20'
+
+jobs:
+  build-modules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      packages: write
+
+    steps:
+      - uses: meta-introspector/checkout@v4
+
+      - uses: meta-introspector/install-nix-action@LATEST
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build modules
+        run: |
+          repo='meta-introspector/mathlib4'
+          branch='feature/split'
+          mkdir -p outputs
+          count=0
+          
+          if [ -n '${{ github.event.inputs.modules }}' ]; then
+            modules=(${{ inputs.modules }})
+          elif [ -n '${{ github.event.inputs.pattern }}' ]; then
+            modules=($(ls mathlib-split/${{ inputs.pattern }}/flake.nix 2>/dev/null | xargs -n1 dirname | head -${{ inputs.max-modules }}))
+          else
+            modules=(Algebra/Ring/Basic Init Data/Nat/Basic Algebra/Group/Basic)
+          fi
+          
+          for module in "${modules[@]}"; do
+            echo "Building $module..."
+            nix build --no-write-lock-file "github:$repo?ref=$branch&dir=$module" 2>&1 | tail -3 || echo "Build skipped for $module"
+            if [ -f /tmp/result/*.lean ]; then
+              cp /tmp/result/*.lean outputs/ 2>/dev/null || true
+              ((count++)) || true
+            fi
+          done
+          echo "Built $count modules"
+
+      - name: Upload built modules
+        run: |
+          echo "Artifacts ready in outputs/"
+          ls outputs/
