@@ -11,13 +11,12 @@ BRANCH = "feature/split"
 def parse_imports(filepath):
     imports = []
     with open(filepath, "r") as f:
-        for line in f:
-            m = re.match(r"import\s+(Mathlib\.[^.]+(?:\.[^.]+)*)", line)
-            if m:
-                imports.append(m.group(1))
-            m = re.match(r"import\s+Mathlib\.([^/\n]+)", line)
-            if m:
-                imports.append("Mathlib." + m.group(1))
+        content = f.read()
+    for m in re.finditer(r"import\s+Mathlib\.([^\s]+)", content):
+        imp = m.group(1)
+        if not imp.startswith("Mathlib."):
+            imp = "Mathlib." + imp
+        imports.append(imp)
     return imports
 
 
@@ -85,9 +84,12 @@ if __name__ == "__main__":
     print(f"Topologically sorted {len(sorted_modules)} modules")
     print("Building in dependency order (first 20):")
     build_modules(sorted_modules[:20])
-    print("\nShowing modules that depend on Init:")
-    init_deps = [m for m in sorted_modules if "Init" in graph.get(m, set())]
-    print(f"Modules importing Init: {init_deps[:10]}")
+    print("\nShowing modules that have dependencies:")
+    deps_modules = [
+        (m, d) for m in sorted_modules for d in graph.get(m, set()) if d != ""
+    ][:10]
+    print(f"Modules with deps: {deps_modules[:10]}")
     print(f"\nVerifying topological order - first 10 modules (roots with no deps):")
     for m in sorted_modules[:10]:
-        print(f"  {m} -> deps: {graph.get(m, set())}")
+        deps = [d for d in graph.get(m, set()) if d in all_modules]
+        print(f"  {m} -> internal deps: {deps}")
