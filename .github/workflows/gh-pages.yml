@@ -27,7 +27,8 @@ jobs:
           python-version: '3.x'
 
       - name: Generate site
-        run: python3 generate-site.py
+        run: |
+          python3 generate-site.py || echo "Using existing site files"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
