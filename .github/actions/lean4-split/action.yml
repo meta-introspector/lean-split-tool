@@ -3,8 +3,8 @@ description: 'Build Lean mathlib modules individually with Nix in topological or
 inputs:
   modules:
     description: 'Space-separated modules to build (e.g., "Algebra/Ring/Basic Data/Nat/Basic")'
-    required: true
-    default: ''
+    required: false
+    default: 'Algebra/Ring/Basic Init Data/Nat/Basic'
   repo:
     description: 'GitHub repo for module sources'
     required: false
