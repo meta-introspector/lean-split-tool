@@ -31,9 +31,10 @@ jobs:
           repo='meta-introspector/mathlib4'
           branch='feature/split'
           
-          modules=(${{ github.event.inputs.modules || 'Algebra/Ring/Basic Init Data/Nat/Basic' }})
           failed=0
           passed=0
+          
+          IFS=' ' read -ra modules <<< '${{ github.event.inputs.modules || "Algebra/Ring/Basic Init Data/Nat/Basic" }}'
           
           for module in "${modules[@]}"; do
             echo "Testing $module..."
