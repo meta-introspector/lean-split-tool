@@ -83,4 +83,11 @@ if __name__ == "__main__":
     graph, all_modules = build_dep_graph()
     sorted_modules = topological_sort(graph, all_modules)
     print(f"Topologically sorted {len(sorted_modules)} modules")
+    print("Building in dependency order (first 20):")
     build_modules(sorted_modules[:20])
+    print("\nShowing modules that depend on Init:")
+    init_deps = [m for m in sorted_modules if "Init" in graph.get(m, set())]
+    print(f"Modules importing Init: {init_deps[:10]}")
+    print(f"\nVerifying topological order - first 10 modules (roots with no deps):")
+    for m in sorted_modules[:10]:
+        print(f"  {m} -> deps: {graph.get(m, set())}")
