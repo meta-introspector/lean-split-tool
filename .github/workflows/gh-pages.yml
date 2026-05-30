@@ -29,9 +29,10 @@ jobs:
         run: |
           python3 generate-site.py
 
-      - uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          static_site: ./site
+          path: ./site
 
   deploy:
     environment:

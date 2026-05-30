@@ -1,0 +1,52 @@
+name: Test Module Builds
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      modules:
+        description: 'Modules to test (space-separated)'
+        required: false
+        default: 'Algebra/Ring/Basic Init Data/Nat/Basic'
+
+jobs:
+  test-builds:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: meta-introspector/checkout@v4
+
+      - uses: meta-introspector/install-nix-action@LATEST
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Test builds
+        run: |
+          repo='meta-introspector/mathlib4'
+          branch='feature/split'
+          
+          modules=(${{ github.event.inputs.modules || 'Algebra/Ring/Basic Init Data/Nat/Basic' }})
+          failed=0
+          passed=0
+          
+          for module in "${modules[@]}"; do
+            echo "Testing $module..."
+            if nix build --no-write-lock-file "github:$repo?ref=$branch&dir=$module" 2>&1; then
+              echo "✓ $module built successfully"
+              ((passed++)) || true
+            else
+              echo "✗ $module failed"
+              ((failed++)) || true
+            fi
+          done
+          
+          echo "Results: $passed passed, $failed failed"
+          if [ $failed -gt 0 ]; then
+            echo "::error::Some builds failed"
+          fi
