@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mathlib Module Dependency Tree</title>
+<style>
+body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+.container { max-width: 1400px; margin: 0 auto; }
+h1 { color: #333; }
+.tree { background: white; padding: 20px; border-radius: 8px; }
+.tree-node { margin: 5px 0; padding-left: 20px; border-left: 2px solid #ddd; }
+.tree-toggle { cursor: pointer; color: #2196f3; }
+.tree-children { margin-left: 20px; display: none; }
+.module-link { color: #333; text-decoration: none; font-family: monospace; }
+.module-link:hover { text-decoration: underline; }
+.search-box { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Mathlib Module Dependency Tree</h1>
+<p>Interactive dependency tree. Root modules (no dependencies) are at the top.</p>
+<input type="text" class="search-box" id="search" onkeyup="filterTree()" placeholder="Search modules...">
+<div class="tree" id="tree">
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.AddConstMap.Equiv" data-name="Algebra.AddConstMap.Equiv">Algebra.AddConstMap.Equiv</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.AffineMonoid.Basic" data-name="Algebra.AffineMonoid.Basic">Algebra.AffineMonoid.Basic</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.AffineMonoid.Irreducible" data-name="Algebra.AffineMonoid.Irreducible">Algebra.AffineMonoid.Irreducible</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.AffineMonoid.UniqueSums" data-name="Algebra.AffineMonoid.UniqueSums">Algebra.AffineMonoid.UniqueSums</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Algebra.Subalgebra.Centralizer" data-name="Algebra.Algebra.Subalgebra.Centralizer">Algebra.Algebra.Subalgebra.Centralizer</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Algebra.Subalgebra.Matrix" data-name="Algebra.Algebra.Subalgebra.Matrix">Algebra.Algebra.Subalgebra.Matrix</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Algebra.Subalgebra.Order" data-name="Algebra.Algebra.Subalgebra.Order">Algebra.Algebra.Subalgebra.Order</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Algebra.Subalgebra.Pi" data-name="Algebra.Algebra.Subalgebra.Pi">Algebra.Algebra.Subalgebra.Pi</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Algebra.Subalgebra.Unitization" data-name="Algebra.Algebra.Subalgebra.Unitization">Algebra.Algebra.Subalgebra.Unitization</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.AlgebraicCard" data-name="Algebra.AlgebraicCard">Algebra.AlgebraicCard</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.ArithmeticGeometric" data-name="Algebra.ArithmeticGeometric">Algebra.ArithmeticGeometric</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Azumaya.Basic" data-name="Algebra.Azumaya.Basic">Algebra.Azumaya.Basic</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Azumaya.Matrix" data-name="Algebra.Azumaya.Matrix">Algebra.Azumaya.Matrix</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.BigOperators.ModEq" data-name="Algebra.BigOperators.ModEq">Algebra.BigOperators.ModEq</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.BrauerGroup.Defs" data-name="Algebra.BrauerGroup.Defs">Algebra.BrauerGroup.Defs</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.AlgCat.Limits" data-name="Algebra.Category.AlgCat.Limits">Algebra.Category.AlgCat.Limits</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.AlgCat.Symmetric" data-name="Algebra.Category.AlgCat.Symmetric">Algebra.Category.AlgCat.Symmetric</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.BoolRing" data-name="Algebra.Category.BoolRing">Algebra.Category.BoolRing</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.CoalgCat.ComonEquivalence" data-name="Algebra.Category.CoalgCat.ComonEquivalence">Algebra.Category.CoalgCat.ComonEquivalence</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.CommAlgCat.FiniteType" data-name="Algebra.Category.CommAlgCat.FiniteType">Algebra.Category.CommAlgCat.FiniteType</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.CommBialgCat" data-name="Algebra.Category.CommBialgCat">Algebra.Category.CommBialgCat</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ContinuousCohomology.Basic" data-name="Algebra.Category.ContinuousCohomology.Basic">Algebra.Category.ContinuousCohomology.Basic</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.FGModuleCat.EssentiallySmall" data-name="Algebra.Category.FGModuleCat.EssentiallySmall">Algebra.Category.FGModuleCat.EssentiallySmall</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.Grp.Images" data-name="Algebra.Category.Grp.Images">Algebra.Category.Grp.Images</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.Grp.IsFinite" data-name="Algebra.Category.Grp.IsFinite">Algebra.Category.Grp.IsFinite</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.Grp.Subobject" data-name="Algebra.Category.Grp.Subobject">Algebra.Category.Grp.Subobject</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.Grp.Ulift" data-name="Algebra.Category.Grp.Ulift">Algebra.Category.Grp.Ulift</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.GrpWithZero" data-name="Algebra.Category.GrpWithZero">Algebra.Category.GrpWithZero</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.HopfAlgCat.Monoidal" data-name="Algebra.Category.HopfAlgCat.Monoidal">Algebra.Category.HopfAlgCat.Monoidal</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Descent" data-name="Algebra.Category.ModuleCat.Descent">Algebra.Category.ModuleCat.Descent</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Differentials.Presheaf" data-name="Algebra.Category.ModuleCat.Differentials.Presheaf">Algebra.Category.ModuleCat.Differentials.Presheaf</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.EnoughInjectives" data-name="Algebra.Category.ModuleCat.EnoughInjectives">Algebra.Category.ModuleCat.EnoughInjectives</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Ext.Finite" data-name="Algebra.Category.ModuleCat.Ext.Finite">Algebra.Category.ModuleCat.Ext.Finite</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.ExteriorPower" data-name="Algebra.Category.ModuleCat.ExteriorPower">Algebra.Category.ModuleCat.ExteriorPower</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Images" data-name="Algebra.Category.ModuleCat.Images">Algebra.Category.ModuleCat.Images</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.LeftResolution" data-name="Algebra.Category.ModuleCat.LeftResolution">Algebra.Category.ModuleCat.LeftResolution</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Localization" data-name="Algebra.Category.ModuleCat.Localization">Algebra.Category.ModuleCat.Localization</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Presheaf.Monoidal" data-name="Algebra.Category.ModuleCat.Presheaf.Monoidal">Algebra.Category.ModuleCat.Presheaf.Monoidal</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Pseudofunctor" data-name="Algebra.Category.ModuleCat.Pseudofunctor">Algebra.Category.ModuleCat.Pseudofunctor</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Sheaf.PullbackFree" data-name="Algebra.Category.ModuleCat.Sheaf.PullbackFree">Algebra.Category.ModuleCat.Sheaf.PullbackFree</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Simple" data-name="Algebra.Category.ModuleCat.Simple">Algebra.Category.ModuleCat.Simple</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Tannaka" data-name="Algebra.Category.ModuleCat.Tannaka">Algebra.Category.ModuleCat.Tannaka</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.ModuleCat.Ulift" data-name="Algebra.Category.ModuleCat.Ulift">Algebra.Category.ModuleCat.Ulift</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.MonCat.Adjunctions" data-name="Algebra.Category.MonCat.Adjunctions">Algebra.Category.MonCat.Adjunctions</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.MonCat.Colimits" data-name="Algebra.Category.MonCat.Colimits">Algebra.Category.MonCat.Colimits</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.MonCat.Yoneda" data-name="Algebra.Category.MonCat.Yoneda">Algebra.Category.MonCat.Yoneda</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Category.Ring.Topology" data-name="Algebra.Category.Ring.Topology">Algebra.Category.Ring.Topology</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Central.Matrix" data-name="Algebra.Central.Matrix">Algebra.Central.Matrix</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.CharP.MixedCharZero" data-name="Algebra.CharP.MixedCharZero">Algebra.CharP.MixedCharZero</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Colimit.Ring" data-name="Algebra.Colimit.Ring">Algebra.Colimit.Ring</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.ContinuedFractions.Computation.TerminatesIffRat" data-name="Algebra.ContinuedFractions.Computation.TerminatesIffRat">Algebra.ContinuedFractions.Computation.TerminatesIffRat</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.DirectSum.Idempotents" data-name="Algebra.DirectSum.Idempotents">Algebra.DirectSum.Idempotents</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Divisibility.Finite" data-name="Algebra.Divisibility.Finite">Algebra.Divisibility.Finite</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.DualQuaternion" data-name="Algebra.DualQuaternion">Algebra.DualQuaternion</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Expr" data-name="Algebra.Expr">Algebra.Expr</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Field.Action.ConjAct" data-name="Algebra.Field.Action.ConjAct">Algebra.Field.Action.ConjAct</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Field.Shrink" data-name="Algebra.Field.Shrink">Algebra.Field.Shrink</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.FreeAlgebra.Cardinality" data-name="Algebra.FreeAlgebra.Cardinality">Algebra.FreeAlgebra.Cardinality</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.FreeMonoid.Count" data-name="Algebra.FreeMonoid.Count">Algebra.FreeMonoid.Count</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.FreeMonoid.Symbols" data-name="Algebra.FreeMonoid.Symbols">Algebra.FreeMonoid.Symbols</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GCDMonoid.PUnit" data-name="Algebra.GCDMonoid.PUnit">Algebra.GCDMonoid.PUnit</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Action.Equidecomp" data-name="Algebra.Group.Action.Equidecomp">Algebra.Group.Action.Equidecomp</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Action.Option" data-name="Algebra.Group.Action.Option">Algebra.Group.Action.Option</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Action.Sigma" data-name="Algebra.Group.Action.Sigma">Algebra.Group.Action.Sigma</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Action.Sum" data-name="Algebra.Group.Action.Sum">Algebra.Group.Action.Sum</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Equiv.Finite" data-name="Algebra.Group.Equiv.Finite">Algebra.Group.Equiv.Finite</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Nat.TypeTags" data-name="Algebra.Group.Nat.TypeTags">Algebra.Group.Nat.TypeTags</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Pointwise.Finset.BigOperators" data-name="Algebra.Group.Pointwise.Finset.BigOperators">Algebra.Group.Pointwise.Finset.BigOperators</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Pointwise.Finset.Density" data-name="Algebra.Group.Pointwise.Finset.Density">Algebra.Group.Pointwise.Finset.Density</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Pointwise.Finset.Interval" data-name="Algebra.Group.Pointwise.Finset.Interval">Algebra.Group.Pointwise.Finset.Interval</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Pointwise.Set.Small" data-name="Algebra.Group.Pointwise.Set.Small">Algebra.Group.Pointwise.Set.Small</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Subgroup.Finsupp" data-name="Algebra.Group.Subgroup.Finsupp">Algebra.Group.Subgroup.Finsupp</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.Translate" data-name="Algebra.Group.Translate">Algebra.Group.Translate</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Group.UniqueProds.VectorSpace" data-name="Algebra.Group.UniqueProds.VectorSpace">Algebra.Group.UniqueProds.VectorSpace</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Action.Faithful" data-name="Algebra.GroupWithZero.Action.Faithful">Algebra.GroupWithZero.Action.Faithful</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Action.Pointwise.Finset" data-name="Algebra.GroupWithZero.Action.Pointwise.Finset">Algebra.GroupWithZero.Action.Pointwise.Finset</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Int" data-name="Algebra.GroupWithZero.Int">Algebra.GroupWithZero.Int</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Pointwise.Set.Card" data-name="Algebra.GroupWithZero.Pointwise.Set.Card">Algebra.GroupWithZero.Pointwise.Set.Card</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Shrink" data-name="Algebra.GroupWithZero.Shrink">Algebra.GroupWithZero.Shrink</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.GroupWithZero.Submonoid.CancelMulZero" data-name="Algebra.GroupWithZero.Submonoid.CancelMulZero">Algebra.GroupWithZero.Submonoid.CancelMulZero</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.HierarchyDesign" data-name="Algebra.HierarchyDesign">Algebra.HierarchyDesign</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Augment" data-name="Algebra.Homology.Augment">Algebra.Homology.Augment</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.BifunctorHomotopy" data-name="Algebra.Homology.BifunctorHomotopy">Algebra.Homology.BifunctorHomotopy</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.BifunctorShift" data-name="Algebra.Homology.BifunctorShift">Algebra.Homology.BifunctorShift</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.DerivedCategory.Ext.Map" data-name="Algebra.Homology.DerivedCategory.Ext.Map">Algebra.Homology.DerivedCategory.Ext.Map</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.DifferentialObject" data-name="Algebra.Homology.DifferentialObject">Algebra.Homology.DifferentialObject</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Embedding.Connect" data-name="Algebra.Homology.Embedding.Connect">Algebra.Homology.Embedding.Connect</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Embedding.ExtendHomotopy" data-name="Algebra.Homology.Embedding.ExtendHomotopy">Algebra.Homology.Embedding.ExtendHomotopy</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Embedding.StupidTrunc" data-name="Algebra.Homology.Embedding.StupidTrunc">Algebra.Homology.Embedding.StupidTrunc</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.EulerCharacteristic" data-name="Algebra.Homology.EulerCharacteristic">Algebra.Homology.EulerCharacteristic</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.ExactSequenceFour" data-name="Algebra.Homology.ExactSequenceFour">Algebra.Homology.ExactSequenceFour</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Factorizations.CM5b" data-name="Algebra.Homology.Factorizations.CM5b">Algebra.Homology.Factorizations.CM5b</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.GrothendieckAbelian" data-name="Algebra.Homology.GrothendieckAbelian">Algebra.Homology.GrothendieckAbelian</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.HomotopyCategory.SpectralObject" data-name="Algebra.Homology.HomotopyCategory.SpectralObject">Algebra.Homology.HomotopyCategory.SpectralObject</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.LeftResolution.Reduced" data-name="Algebra.Homology.LeftResolution.Reduced">Algebra.Homology.LeftResolution.Reduced</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.LocalCohomology" data-name="Algebra.Homology.LocalCohomology">Algebra.Homology.LocalCohomology</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.Monoidal" data-name="Algebra.Homology.Monoidal">Algebra.Homology.Monoidal</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.ShortComplex.FunctorEquivalence" data-name="Algebra.Homology.ShortComplex.FunctorEquivalence">Algebra.Homology.ShortComplex.FunctorEquivalence</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Homology.ShortComplex.Linear" data-name="Algebra.Homology.ShortComplex.Linear">Algebra.Homology.ShortComplex.Linear</a></div>
+<div class="tree-node" style="padding-left: 0px"><a class="module-link" href="index.html#Algebra.Lie.CartanExists" data-name="Algebra.Lie.CartanExists">Algebra.Lie.CartanExists</a></div>
+</div>
+<script>
+function toggleTree(el) {
+  const next = el.nextElementSibling;
+  if (next && next.classList.contains('tree-children')) {
+    next.style.display = next.style.display === 'none' ? 'block' : 'none';
+    el.textContent = next.style.display === 'none' ? '▶' : '▼';
+  }
+}
+function filterTree() {
+  const term = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.tree-node').forEach(node => {
+    const name = node.querySelector('.module-link').dataset.name;
+    node.style.display = name.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+</script>
+</div>
+</body>
+</html>

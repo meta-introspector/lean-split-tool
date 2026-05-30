@@ -33,6 +33,16 @@
         program = "${pkgs.python3}/bin/python3 ${./generate-lattice.py}";
       };
       
+      apps.${system}.lean-split-cli = {
+        type = "app";
+        program = "${pkgs.python3}/bin/python3 ${./lean-split-cli.py}";
+      };
+      
+      apps.${system}.generate-site = {
+        type = "app";
+        program = "${pkgs.python3}/bin/python3 ${./generate-site.py}";
+      };
+      
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [ pkgs.lean4 pkgs.git pkgs.python3 ];
         shellHook = ''
