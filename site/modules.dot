@@ -1,7 +1,7 @@
 digraph MathlibModules {
   rankdir=TB;
   node [shape=box, style=filled, fillcolor=lightblue];
-  "LinearAlgebra.Dimension.Finite";
+  "RingTheory.Spectrum.Prime.Chevalley";
   "Algebra.AddConstMap.Basic" -> "Algebra.AddConstMap.Equiv";
   "Algebra.AddTorsor.Basic" -> "LinearAlgebra.AffineSpace.AffineMap";
   "Algebra.AddTorsor.Basic" -> "Topology.Algebra.Group.AddTorsor";

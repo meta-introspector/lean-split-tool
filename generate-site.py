@@ -50,7 +50,7 @@ def generate_dot(graph, all_modules):
 
 
 def generate_3d_html(graph, all_modules):
-    """Generate interactive 3D graph using vis.js"""
+    """Generate interactive 3D graph using vis.js with hierarchical layout"""
     nodes = [
         {"id": m, "label": m, "level": m.count(".")} for m in list(all_modules)[:5000]
     ]
@@ -67,17 +67,17 @@ def generate_3d_html(graph, all_modules):
     return f"""<!DOCTYPE html>
 <html>
 <head>
-<title>Mathlib 3D Dependency Graph</title>
+<title>Mathlib Dependency Graph</title>
 <style>
 body {{ margin: 0; font-family: sans-serif; }}
 #graph3d {{ width: 100vw; height: 100vh; }}
-.overlay {{ position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; }}
+.overlay {{ position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 5px; z-index: 1000; }}
 </style>
 </head>
 <body>
 <div class="overlay">
-<h3>3D Mathlib Dependency Graph</h3>
-<p>Drag to rotate, scroll to zoom. <a href="index.html">Back to selector</a></p>
+<h3>Mathlib Dependency Graph (Hierarchical)</h3>
+<p>Level = module depth. Drag to move, scroll to zoom. <a href="index.html">Back to selector</a></p>
 </div>
 <div id="graph3d"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis.js/9.1.6/vis-network.min.js"></script>
@@ -88,9 +88,25 @@ fetch('graph-data.json').then(r => r.json()).then(data => {{
   var container = document.getElementById('graph3d');
   var networkData = {{ nodes: nodes, edges: edges }};
   var options = {{
-    physics: {{ stabilization: false }},
-    interaction: {{ hover: true }},
-    nodes: {{ font: {{ size: 12 }} }}
+    layout: {{ 
+      hierarchical: {{ 
+        direction: "UD", 
+        sortMethod: "hubsize",
+        nodeSpacing: 150,
+        levelSeparation: 200
+      }} 
+    }},
+    physics: {{ stabilization: {{ iterations: 100 }} }},
+    interaction: {{ hover: true, navigationButtons: true }},
+    nodes: {{ 
+      font: {{ size: 12 }},
+      shape: "box",
+      margin: 10
+    }},
+    edges: {{ 
+      smooth: {{ type: "cubicBezier" }},
+      arrows: {{ to: {{ enabled: true, scaleFactor: 0.5 }} }}
+    }}
   }};
   var network = new vis.Network(container, networkData, options);
 }});
