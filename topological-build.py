@@ -12,10 +12,9 @@ def parse_imports(filepath):
     imports = []
     with open(filepath, "r") as f:
         content = f.read()
-    for m in re.finditer(r"import\s+Mathlib\.([^\s]+)", content):
+    for m in re.finditer(r"import\s+(Mathlib\.[^\s]+)", content):
         imp = m.group(1)
-        if not imp.startswith("Mathlib."):
-            imp = "Mathlib." + imp
+        imp = imp.replace("Mathlib.", "", 1) if imp.startswith("Mathlib.") else imp
         imports.append(imp)
     return imports
 
