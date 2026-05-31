@@ -2,9 +2,13 @@
 import os
 import re
 import json
+import urllib.request
 from collections import defaultdict
 
-SOURCE_DIR = "/mnt/data1/time-2026/03-march/23/voa-borcherds-archive/mathlib4/Mathlib"
+SOURCE_DIR = os.environ.get(
+    "SOURCE_DIR",
+    "/mnt/data1/time-2026/03-march/23/voa-borcherds-archive/mathlib4/Mathlib",
+)
 OUTPUT_DIR = "site"
 
 
