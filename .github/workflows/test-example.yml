@@ -1,0 +1,36 @@
+name: Test Example Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: meta-introspector/install-nix-action@LATEST
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build GradedMonoid module
+        run: |
+          nix build --no-write-lock-file "github:meta-introspector/mathlib4?ref=feature/split&dir=Algebra/GradedMonoid" 2>&1 | tail -20
+          ls -la /tmp/result/
+          wc -l /tmp/result/*.lean
+
+      - name: Verify build succeeded
+        run: |
+          if [ -f /tmp/result/GradedMonoid.lean ]; then
+            echo "✓ GradedMonoid.lean built successfully ($(wc -l < /tmp/result/GradedMonoid.lean) lines)"
+          else
+            echo "✗ Build failed"
+            exit 1
+          fi
