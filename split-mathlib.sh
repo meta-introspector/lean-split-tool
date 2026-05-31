@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-MATHLIB_REPO="${1:-/mnt/data1/git/github.com/leanprover-community/mathlib4.git}"
-OUTPUT_BRANCH="${3:-feature/split}"
+MATHLIB_REPO="${1:-https://github.com/meta-introspector/mathlib4.git}"
+OUTPUT_BRANCH="${2:-feature/split}"
 WORK_DIR=$(mktemp -d)
 
 echo "Generating modular flakes in $WORK_DIR"
 
-# Use existing mathlib source
-cp -r /mnt/data1/time-2026/03-march/23/voa-borcherds-archive/mathlib4/Mathlib "$WORK_DIR/"
+# Clone latest mathlib
+echo "Cloning latest mathlib..."
+git clone --depth 1 https://github.com/leanprover-community/mathlib4.git "$WORK_DIR/mathlib-latest"
+
+# Copy mathlib source
+cp -r "$WORK_DIR/mathlib-latest/Mathlib" "$WORK_DIR/"
 
 # Generate flake.nix for each module
 mkdir -p "$WORK_DIR/split"

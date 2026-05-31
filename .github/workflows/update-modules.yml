@@ -1,0 +1,56 @@
+name: Update Modules
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  generate-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: meta-introspector/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Clone latest mathlib
+        run: |
+          git clone --depth 1 https://github.com/leanprover-community/mathlib4.git
+          cp -r mathlib4/Mathlib .
+
+      - name: Generate modular flakes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 split-mathlib.sh
+
+      - name: Generate site
+        run: python3 generate-site.py
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: generate-modules
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: ./site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
