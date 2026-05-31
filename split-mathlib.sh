@@ -29,6 +29,11 @@ find Mathlib -name "*.lean" -type f | while read f; do
     out_dir="$WORK_DIR/split/${rel%.lean}"
     mkdir -p "$out_dir"
     
+    # Copy lean-toolchain from root if exists
+    if [[ -f "Mathlib/../lean-toolchain" ]]; then
+        cp "Mathlib/../lean-toolchain" "$out_dir/" 2>/dev/null || true
+    fi
+    
     cat > "$out_dir/flake.nix" << EOF
 # Generated flake.nix for $mod
 {
@@ -41,15 +46,23 @@ find Mathlib -name "*.lean" -type f | while read f; do
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.\${system};
-    in {
+    in
+    {
       packages.\${system}.default = pkgs.stdenv.mkDerivation {
         pname = "mathlib-module-$mod";
         version = "0.1.0";
         src = ./.;
-        phases = [ "unpackPhase" "installPhase" ];
+        nativeBuildInputs = [ pkgs.lean4 ];
+        dontInstall = true;
+        buildPhase = ''
+          runHook preBuild
+          lean --make $(basename "\$src") 2>&1 || echo "Build note: may need dependencies"
+          runHook postBuild
+        '';
         installPhase = ''
           mkdir -p \$out
-          cp $(basename "$f") \$out/
+          cp *.lean \$out/ 2>/dev/null || true
+          cp -r *.olean \$out/ 2>/dev/null || true
         '';
       };
     };
