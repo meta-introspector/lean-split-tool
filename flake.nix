@@ -1,57 +1,34 @@
 {
-  description = "Mathlib modular flakes - generate per-module Nix packages";
+  description = "Lean4 split tool for generating per-declaration flakes";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    lean4-nix.url = "github:lenianiva/lean4-nix";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = inputs@{ nixpkgs, lean4-nix, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      
-      submoduleDirs = [
-        "mathlib-split/Algebra/Ring/Basic"
-        "mathlib-split/Init"
-        "mathlib-split/Data/Nat/Basic"
-      ];
+      leanOverlays = lean4-nix.readToolchainFile ./lean-toolchain;
+      leanPkgs = import nixpkgs { inherit system; overlays = [ leanOverlays ]; };
     in
     {
-      apps.${system}.generate-split = {
-        type = "app";
-        program = "${./split-mathlib.sh}";
-      };
+      packages.${system}.default = leanPkgs.lean.lean-all;
       
-      apps.${system}.topological-build = {
+      apps.${system}.run-split = {
         type = "app";
-        program = "${pkgs.python3}/bin/python3 ${./topological-build.py}";
-      };
-      
-      apps.${system}.generate-lattice = {
-        type = "app";
-        program = "${pkgs.python3}/bin/python3 ${./generate-lattice.py}";
-      };
-      
-      apps.${system}.lean-split-cli = {
-        type = "app";
-        program = "${pkgs.python3}/bin/python3 ${./lean-split-cli.py}";
-      };
-      
-      apps.${system}.default = apps.${system}.lean-split-cli;
-      
-      apps.${system}.generate-site = {
-        type = "app";
-        program = "${pkgs.python3}/bin/python3 ${./generate-site.py}";
+        program = pkgs.writeShellScript "run-split" ''
+          exec ${leanPkgs.lean.lean-all}/bin/lean --run ${./TestFlake.lean}
+        '';
       };
       
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [ pkgs.lean4 pkgs.git pkgs.python3 ];
-        shellHook = ''
-          echo "Modular mathlib flake tool"
-          echo "Run: nix run .#generate-split to publish flakes to bare repo"
-          echo "Run: nix run .#topological-build to build in dependency order"
-        '';
+        buildInputs = [
+          leanPkgs.lean.lean-all
+          leanPkgs.lean.lake
+          pkgs.git
+        ];
       };
     };
 }
