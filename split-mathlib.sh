@@ -3,16 +3,20 @@ set -e
 
 MATHLIB_REPO="${1:-https://github.com/meta-introspector/mathlib4.git}"
 OUTPUT_BRANCH="${2:-feature/split}"
+SOURCE_DIR="${3:-/mnt/data1/time-2026/05-may/06/fuzztest/dag_cbrrr_fuzz_project/IMPL/99/other/leanprover-community/mathlib4/Mathlib}"
 WORK_DIR=$(mktemp -d)
 
 echo "Generating modular flakes in $WORK_DIR"
 
-# Clone latest mathlib
-echo "Cloning latest mathlib..."
-git clone --depth 1 https://github.com/leanprover-community/mathlib4.git "$WORK_DIR/mathlib-latest"
-
-# Copy mathlib source
-cp -r "$WORK_DIR/mathlib-latest/Mathlib" "$WORK_DIR/"
+# Use provided source or clone latest mathlib
+if [[ -d "$SOURCE_DIR" ]]; then
+    echo "Using mathlib source from $SOURCE_DIR"
+    cp -r "$SOURCE_DIR" "$WORK_DIR/Mathlib"
+else
+    echo "Cloning latest mathlib..."
+    git clone --depth 1 https://github.com/leanprover-community/mathlib4.git "$WORK_DIR/mathlib-latest"
+    cp -r "$WORK_DIR/mathlib-latest/Mathlib" "$WORK_DIR/"
+fi
 
 # Generate flake.nix for each module
 mkdir -p "$WORK_DIR/split"
