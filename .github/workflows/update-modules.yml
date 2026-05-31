@@ -2,7 +2,7 @@ name: Update Modules
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Weekly
+    - cron: '0 0 * * *'  # Daily at midnight UTC
   workflow_dispatch:
 
 permissions:
@@ -26,14 +26,17 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/leanprover-community/mathlib4.git
           cp -r mathlib4/Mathlib .
+          echo "SOURCE_DIR=$(pwd)/Mathlib" >> $GITHUB_ENV
 
       - name: Generate modular flakes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 split-mathlib.sh
-
+        run: |
+          SOURCE_DIR="${{ env.SOURCE_DIR }}" ./split-mathlib.sh
+      
       - name: Generate site
-        run: python3 generate-site.py
+        run: |
+          SOURCE_DIR="${{ env.SOURCE_DIR }}" python3 generate-site.py
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
